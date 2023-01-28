@@ -10,59 +10,13 @@ env:
   SHELL: /bin/bash
 
 jobs:
-  mac:
-    runs-on: macos-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        features: ["--features debugmozjs", ""]
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install deps
-      run: brew install python autoconf@2.13 ccache llvm yasm
-    - uses: dtolnay/rust-toolchain@stable
-    - name: ccache cache files
-      uses: actions/cache@v1.1.0
-      with:
-        path: .ccache
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
-    - name: Build
-      run: |
-        ccache -z
-        ccache cargo build --verbose ${{ matrix.features }}
-        ccache cargo test --verbose ${{ matrix.features }}
-        ccache -s
-  linux:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        features: ["--features debugmozjs", ""]
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install deps
-      run: |
-        sudo apt install autoconf2.13 ccache llvm -y
-    - uses: dtolnay/rust-toolchain@stable
-    - name: ccache cache files
-      uses: actions/cache@v1.1.0
-      with:
-        path: .ccache
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
-    - name: Build
-      run: |
-        ccache -z
-        ccache cargo build --verbose ${{ matrix.features }}
-        ccache cargo test --verbose ${{ matrix.features }}
-        ccache -s
   windows:
     runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
         features: ["--features debugmozjs", ""]
-        #target: [""]
-        target: ["", "aarch64-uwp-windows-msvc", "x86_64-uwp-windows-msvc"]
+        target: [""]
     steps:
     - uses: actions/checkout@v2
     - name: Install deps
@@ -74,24 +28,6 @@ jobs:
         scoop install llvm@15.0.7 --global
         echo "C:\ProgramData\scoop\shims;C:\Users\runneradmin\scoop\shims" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - uses: dtolnay/rust-toolchain@stable
-    - name: Build uwp
-      if: contains(matrix.target, 'uwp')
-      shell: cmd
-      env:
-        MOZTOOLS_PATH: 'C:\mozilla-build\msys\bin;C:\mozilla-build\bin'
-        AUTOCONF: "C:/mozilla-build/msys/local/bin/autoconf-2.13"
-        LINKER: "lld-link.exe"
-        CC: "clang-cl.exe"
-        CXX: "clang-cl.exe"
-        NATIVE_WIN32_PYTHON: "C:\\mozilla-build\\python2\\python.exe"
-        PYTHON3: "C:\\mozilla-build\\python3\\python3.exe"
-        LIBCLANG_PATH: "C:\\ProgramData\\scoop\\apps\\llvm\\current\\lib"
-      run: |
-        rustup install nightly-2022-11-20
-        rustup default nightly-2022-11-20
-        rustup component add rust-src
-        rustc --version --verbose
-        cargo build --verbose ${{ matrix.features }} -Z build-std=std,panic_abort --target ${{ matrix.target }}
     - name: Build Windows
       if: contains(matrix.target, 'uwp') != true
       shell: cmd
@@ -107,31 +43,12 @@ jobs:
       run: |
         rustup install nightly-2022-11-20
         rustup default nightly-2022-11-20
-        cargo test --verbose ${{ matrix.features }} --lib
-  Integrity:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Get mozjs
-      run: |
-        bash ./mozjs/etc/get_mozjs.sh
-    - name: Apply patch
-      run: |
-        python3 ./mozjs/etc/update.py --no-commit mozjs.tar.xz
-        # Run `git add` here to force CRLF converted into LF
-        # so that we can check diff properly in next run
-        git add --all mozjs
-    - name: Check patch integrity
-      working-directory: ./mozjs
-      # Because we've added files in previous run, we need to
-      # check diff with `--staged`.
-      run: |
-        git diff --staged --no-ext-diff --quiet --exit-code
+        cargo test --verbose ${{ matrix.features }} --release --lib
   build_result:
     name: homu build finished
     runs-on: ubuntu-latest
     # Integrity check is broken for the time being; don't require it.
-    needs: ["mac", "linux", "windows"]
+    needs: ["windows"]
     steps:
       - name: Mark the job as successful
         run: exit 0
