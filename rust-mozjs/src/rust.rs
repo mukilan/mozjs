@@ -976,11 +976,7 @@ pub unsafe fn FinishOffThreadStencil(
     token: *mut OffThreadToken,
     storage: *mut InstantiationStorage,
 ) -> Stencil {
-    let mut stencil = already_AddRefed {
-        mRawPtr: std::ptr::null_mut(),
-        _phantom_0: PhantomData,
-    };
-    crate::glue::FinishOffThreadStencil(cx, token, storage, &mut stencil);
+    let stencil = jsapi::FinishOffThreadStencil(cx, token, storage);
     return Stencil { inner: stencil };
 }
 
