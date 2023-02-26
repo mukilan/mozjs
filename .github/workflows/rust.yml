@@ -43,7 +43,7 @@ jobs:
       run: |
         rustup install nightly-2022-11-20
         rustup default nightly-2022-11-20
-        cargo test --verbose ${{ matrix.features }} --release --lib
+        cargo test --verbose ${{ matrix.features }} --release
   build_result:
     name: homu build finished
     runs-on: ubuntu-latest
