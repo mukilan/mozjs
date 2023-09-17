@@ -68,7 +68,7 @@ ifneq ($(HOST),$(TARGET))
 		# to define it in the compiler arguments.
 		TARGET := $(TARGET)$(ANDROID_API_LEVEL)
 
-		# STLPORT_CPPFLAGS and the toolchain directory are set here just to
+		# STLPORT_LIBS and the toolchain directory are set here just to
 		# make the SpiderMonkey build system happy. rust-mozjs patches have
 		# disabled the actual use of these values, as the NDKs compiler should
 		# take care of setting these flags internally.
@@ -77,7 +77,7 @@ ifneq ($(HOST),$(TARGET))
 			--with-android-ndk=$(ANDROID_NDK_HOME) \
 			--with-android-platform="$(ANDROID_NDK_HOME)/sysroot" \
 			--with-android-version=$(ANDROID_API_LEVEL) \
-			STLPORT_CPPFLAGS=" " \
+			STLPORT_LIBS=" " \
 			$(NULL)
 	endif
 
