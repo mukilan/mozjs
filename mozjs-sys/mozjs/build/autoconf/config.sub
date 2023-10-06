@@ -1745,7 +1745,7 @@ case $os in
 	     | midipix* | mingw32* | mingw64* | mint* \
 	     | uxpv* | beos* | mpeix* | udk* | moxiebox* \
 	     | interix* | uwin* | mks* | rhapsody* | darwin* \
-	     | openstep* | oskit* | conix* | pw32* | nonstopux* \
+	     | ohos* | openstep* | oskit* | conix* | pw32* | nonstopux* \
 	     | storm-chaos* | tops10* | tenex* | tops20* | its* \
 	     | os2* | vos* | palmos* | uclinux* | nucleus* | morphos* \
 	     | scout* | superux* | sysv* | rtmk* | tpf* | windiss* \
@@ -1771,7 +1771,7 @@ esac
 # As a final step for OS-related things, validate the OS-kernel combination
 # (given a valid OS), if there is a kernel.
 case $kernel-$os in
-	linux-gnu* | linux-dietlibc* | linux-android* | linux-newlib* \
+	linux-gnu* | linux-dietlibc* | linux-android* | linux-ohos* | linux-newlib* \
 		   | linux-musl* | linux-relibc* | linux-uclibc* )
 		;;
 	uclinux-uclibc* )
