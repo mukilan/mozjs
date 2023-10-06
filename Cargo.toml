@@ -1,5 +1,5 @@
 [workspace]
-members = ["mozjs", "rust-mozjs"]
+members = ["mozjs-sys", "mozjs"]
 resolver = "2"
 
 [workspace.package]
@@ -10,7 +10,11 @@ edition = "2021"
 [workspace.dependencies]
 cc = "1"
 libc = "0.2"
-bindgen = { version = "0.66", default-features = false, features = [
+bindgen = { version = "0.68", default-features = false, features = [
     "runtime",
     "which-rustfmt",
 ] }
+
+[patch.crates-io]
+# until version with https://github.com/rust-lang/libz-sys/pull/157 is released
+libz-sys = { git = "https://github.com/rust-lang/libz-sys", branch = "main" }
