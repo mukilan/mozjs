@@ -63,7 +63,7 @@ JS::RealmOptions* JS_NewRealmOptions() {
 
 void DeleteRealmOptions(JS::RealmOptions* options) { delete options; }
 
-void SetRealmCreationOptionToNewComparmentinExistingZone(
+void SetRealmCreationOptionToNewComparmentInExistingZone(
     JS::RealmOptions* options, JS::Handle<JSObject*> compartmentRoot) {
   options->creationOptions().setNewCompartmentInExistingZone(compartmentRoot);
 }
