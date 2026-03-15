@@ -36,7 +36,7 @@ use crate::glue::{
     GetIdVectorAddress, GetObjectVectorAddress, NewCompileOptions, SliceRootedIdVector,
 };
 use crate::jsapi;
-use crate::jsapi::glue::{DeleteRealmOptions, JS_Init, JS_NewRealmOptions};
+use crate::jsapi::glue::{DeleteRealmOptions, JS_Init, JS_NewRealmOptions, SetRealmCreationOptionToNewCompartmentInExistingZone};
 use crate::jsapi::js;
 use crate::jsapi::js::frontend::InitialStencilAndDelazifications;
 use crate::jsapi::mozilla::Utf8Unit;
