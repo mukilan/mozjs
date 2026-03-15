@@ -128,6 +128,12 @@ impl ToResult for bool {
 
 pub struct RealmOptions(*mut jsapi::RealmOptions);
 
+impl RealmOptions {
+    fn setCreationOptionToNewCompartmentInExistingZone(&mut self, object: HandleObject) {
+        SetRealmCreationOptionToNewCompartmentInExistingZone(self.0, object);
+    }
+}
+
 impl Deref for RealmOptions {
     type Target = jsapi::RealmOptions;
     fn deref(&self) -> &Self::Target {

@@ -63,6 +63,11 @@ JS::RealmOptions* JS_NewRealmOptions() {
 
 void DeleteRealmOptions(JS::RealmOptions* options) { delete options; }
 
+void SetRealmCreationOptionToNewComparmentinExistingZone(
+    JS::RealmOptions* options, JS::Handle<JSObject*> compartmentRoot) {
+  options->creationOptions().setNewCompartmentInExistingZone(compartmentRoot);
+}
+
 JS::OwningCompileOptions* JS_NewOwningCompileOptions(JSContext* cx) {
   JS::OwningCompileOptions* result = new JS::OwningCompileOptions(cx);
   return result;
