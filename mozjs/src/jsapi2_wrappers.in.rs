@@ -72,6 +72,7 @@ wrap!(jsapi: pub fn BigIntFromBool(cx: &mut JSContext, b: bool) -> *mut BigInt);
 wrap!(jsapi: pub fn CallMethodIfWrapped(cx: &mut JSContext, test: IsAcceptableThis, impl_: NativeImpl, args: *const CallArgs) -> bool);
 wrap!(jsapi: pub fn ReportSourceTooLong(cx: &mut JSContext));
 wrap!(jsapi: pub fn IsIncrementalBarrierNeeded(cx: &JSContext) -> bool);
+wrap!(jsapi: pub fn IncrementalPreWriteBarrier(obj: *mut JSObject));
 wrap!(jsapi: pub fn GetCurrentRealmOrNull(cx: &JSContext) -> *mut Realm);
 wrap!(jsapi: pub fn SetDestroyRealmCallback(cx: &JSContext, callback: DestroyRealmCallback));
 wrap!(jsapi: pub fn SetRealmNameCallback(cx: &JSContext, callback: RealmNameCallback));
