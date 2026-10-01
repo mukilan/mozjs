@@ -413,6 +413,7 @@ impl<T: GCMethods + Copy> Drop for Heap<T> {
         unsafe {
             let ptr = self.ptr.get();
             T::post_barrier(ptr, *ptr, <T as GCMethods>::initial());
+            println!("Called drop for Heap<{:?}> ptr({:?})", std::any::type_name::<T>(), *(ptr as *mut *mut ()));
         }
     }
 }
