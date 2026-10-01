@@ -20,6 +20,7 @@ use std::collections::btree_map::BTreeMap;
 use std::collections::btree_set::BTreeSet;
 use std::collections::vec_deque::VecDeque;
 use std::collections::{HashMap, HashSet};
+use std::ffi::CString;
 use std::hash::{BuildHasher, Hash};
 use std::num::{
     NonZeroI128, NonZeroI16, NonZeroI32, NonZeroI64, NonZeroI8, NonZeroIsize, NonZeroU128,
@@ -34,6 +35,11 @@ use std::sync::atomic::{
 };
 use std::thread::JoinHandle;
 use std::time::{Duration, Instant, SystemTime};
+
+
+thread_local! {
+    pub static CURRENT_TRACED: RefCell<Vec<String>> = const { RefCell::new(Vec::new()) };
+}
 
 /// Types that can be traced.
 ///
@@ -60,7 +66,9 @@ unsafe impl Traceable for Heap<*mut JSObject> {
         if self.get().is_null() {
             return;
         }
-        CallObjectTracer(trc, self as *const _ as *mut Self, c"object".as_ptr());
+        let bt = format!("object: {:?}", CURRENT_TRACED.with_borrow(|t| t.join( "->")));
+        let cstr = CString::new(bt).unwrap();
+        CallObjectTracer(trc, self as *const _ as *mut Self, cstr.into_raw());
     }
 }
 
@@ -105,7 +113,10 @@ unsafe impl Traceable for Heap<*mut JSString> {
 unsafe impl Traceable for Heap<Value> {
     #[inline]
     unsafe fn trace(&self, trc: *mut JSTracer) {
-        CallValueTracer(trc, self as *const _ as *mut Self, c"value".as_ptr());
+        //let bt = std::backtrace::Backtrace::capture();
+        let bt = format!("value: {:?}", CURRENT_TRACED.with_borrow(|t| t.join( "->")));
+        let cstr = CString::new(bt).unwrap();
+        CallValueTracer(trc, self as *const _ as *mut Self, cstr.into_raw());
     }
 }
 
