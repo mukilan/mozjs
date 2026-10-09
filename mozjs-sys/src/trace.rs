@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+use crate::glue::JS::IncrementalPreWriteBarrier;
 use crate::glue::{
     CallBigIntTracer, CallFunctionTracer, CallIdTracer, CallObjectTracer,
     CallPropertyDescriptorTracer, CallScriptTracer, CallStringTracer, CallSymbolTracer,
@@ -48,6 +49,8 @@ thread_local! {
 pub unsafe trait Traceable {
     /// Trace `self`.
     unsafe fn trace(&self, trc: *mut JSTracer);
+
+    fn pre_write_barrier(&self) { }
 }
 
 unsafe impl Traceable for Heap<*mut JSFunction> {
@@ -69,6 +72,14 @@ unsafe impl Traceable for Heap<*mut JSObject> {
         let bt = format!("object: {:?}", CURRENT_TRACED.with_borrow(|t| t.join( "->")));
         let cstr = CString::new(bt).unwrap();
         CallObjectTracer(trc, self as *const _ as *mut Self, cstr.into_raw());
+    }
+
+    fn pre_write_barrier(&self) {
+        if self.get().is_null() {
+            return;
+        }
+        println!("Invoking IncrementalPreWriteBarrier for *mut JSObject: {:?}", self.get());
+        unsafe { IncrementalPreWriteBarrier(self.get() ); }
     }
 }
 
@@ -146,6 +157,10 @@ unsafe impl<T: Traceable> Traceable for Rc<T> {
     unsafe fn trace(&self, trc: *mut JSTracer) {
         (**self).trace(trc);
     }
+
+    fn pre_write_barrier(&self) {
+        (**self).pre_write_barrier();
+    }
 }
 
 unsafe impl<T: Traceable + ?Sized> Traceable for Box<T> {
@@ -180,6 +195,10 @@ unsafe impl<T: Traceable> Traceable for Option<T> {
     #[inline]
     unsafe fn trace(&self, trc: *mut JSTracer) {
         self.as_ref().map(|t| t.trace(trc));
+    }
+
+    fn pre_write_barrier(&self) {
+        self.as_ref().map(|t| t.pre_write_barrier());
     }
 }
 
