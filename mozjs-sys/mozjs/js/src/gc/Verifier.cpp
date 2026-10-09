@@ -214,6 +214,10 @@ void gc::GCRuntime::startVerifyPreBarriers() {
     return;
   }
 
+  // char msgbuf[1024];
+  // SprintfLiteral( msgbuf, "==== [barrier verifier] Starting Verfier snapshot ===== ");
+  // MOZ_ReportAssertionFailure(msgbuf, __FILE__, __LINE__);
+
   AutoPrepareForTracing prep(cx);
 
 #  ifdef DEBUG

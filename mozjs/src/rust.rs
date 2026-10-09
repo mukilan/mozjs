@@ -66,7 +66,7 @@ use crate::panic::maybe_resume_unwind;
 use crate::realm::AutoRealm;
 use log::{debug, warn};
 use mozjs_sys::jsapi::JS::SavedFrameResult;
-pub use mozjs_sys::jsgc::{GCMethods, IntoHandle, IntoMutableHandle};
+pub use mozjs_sys::jsgc::{GCMethods, IntoHandle, IntoMutableHandle, RootedVFTable};
 pub use mozjs_sys::trace::Traceable as Trace;
 
 use crate::rooted;
