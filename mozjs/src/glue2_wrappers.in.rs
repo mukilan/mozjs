@@ -45,3 +45,4 @@ wrap!(glue: pub fn StackGCVectorValueLength(vec: Handle<StackGCVector<Value, Tem
 wrap!(glue: pub fn StackGCVectorStringLength(vec: Handle<StackGCVector<*mut JSString, TempAllocPolicy>>) -> u32);
 wrap!(glue: pub fn StackGCVectorValueAtIndex(vec: Handle<StackGCVector<Value, TempAllocPolicy>>, index: u32) -> *const Value);
 wrap!(glue: pub fn StackGCVectorStringAtIndex(vec: Handle<StackGCVector<*mut JSString, TempAllocPolicy>>, index: u32) -> *const *mut JSString);
+wrap!(glue: pub fn ObjectIsTenured(obj: *mut JSObject) -> bool);
