@@ -1285,4 +1285,8 @@ JSString* const* StackGCVectorStringAtIndex(
   return vec.begin() + index;
 }
 
+bool ObjectIsTenured(JSObject* obj) {
+  return JS::ObjectIsTenured(obj);
+}
+
 }  // extern "C"
