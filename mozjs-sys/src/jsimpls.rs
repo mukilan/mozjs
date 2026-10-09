@@ -24,6 +24,7 @@ use crate::jsapi::JS::Scalar::Type;
 use crate::jsgc::{RootKind, Rooted, RootedBase, ValueArray};
 use crate::jsid::VoidId;
 use crate::jsval::{JSVal, UndefinedValue};
+use crate::trace::Traceable;
 
 use std::marker::PhantomData;
 use std::ops::Deref;
@@ -441,6 +442,9 @@ impl<T: RootKind> JS::Rooted<T> {
     }
 
     pub unsafe fn add_to_root_stack(this: *mut Self, cx: *mut JSContext) {
+        //println!("add_to_root_stack for {:?}", std::any::type_name::<T>());
+        let traceable = unsafe { &*this };
+        traceable.data.pre_write_barrier();
         let base = unsafe { &raw mut (*this).base };
         RootedBase::add_to_root_stack(base, cx, T::KIND)
     }

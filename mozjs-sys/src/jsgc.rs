@@ -17,6 +17,8 @@ pub trait RootKind {
     type Vtable;
     const VTABLE: Self::Vtable;
     const KIND: JS::RootKind;
+
+    fn pre_write_barrier(&self) {}
 }
 
 impl RootKind for *mut JSObject {
@@ -71,6 +73,11 @@ impl<T: Rootable> RootKind for T {
     type Vtable = *const RootedVFTable;
     const VTABLE: Self::Vtable = &<Self as Rootable>::VTABLE;
     const KIND: JS::RootKind = JS::RootKind::Traceable;
+
+    fn pre_write_barrier(&self) {
+        println!("pre_write_barrier for RootKind<T>");
+        T::pre_write_barrier(self)
+    }
 }
 
 /// A vtable for use in RootedTraceable<T>, which must be present for stack roots using
