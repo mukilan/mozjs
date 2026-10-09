@@ -110,6 +110,20 @@ pub trait Rootable: crate::trace::Traceable + Sized {
     }
 }
 
+// impl<T: Rootable> Rootable for Option<T> {
+//     const VTABLE: RootedVFTable = RootedVFTable {
+//         padding: RootedVFTable::PADDING,
+//         trace: <Self as Rootable>::trace,
+//     };
+//
+//     unsafe extern "C" fn trace(this: *mut c_void, trc: *mut JSTracer, _name: *const c_char) {
+//         println!("Tracing Rootedd<Option<{:?}>", std::any::type_name::<T>());
+//         let rooted = this as *mut Rooted<Self>;
+//         let rooted = rooted.as_mut().unwrap();
+//         <Self as crate::trace::Traceable>::trace(&mut rooted.data, trc);
+//     }
+// }
+
 impl<T: Rootable> Rootable for Option<T> {}
 impl<T: crate::trace::Traceable> Rootable for Vec<T> {}
 impl<T: crate::trace::Traceable> Rootable for VecDeque<T> {}
@@ -176,6 +190,10 @@ impl Initialize for *mut JSObject {
 
 impl GCMethods for *mut JSObject {
     unsafe fn post_barrier(v: *mut *mut JSObject, prev: *mut JSObject, next: *mut JSObject) {
+        // println!(
+        //     "invoking post barrier for *mut JSObject with: {:?}, prev: {:?}, next: {:?}",
+        //     v as *mut *mut (), prev as *mut (), next as *mut ()
+        // );
         JS::HeapObjectWriteBarriers(v, prev, next);
     }
 }
@@ -413,7 +431,7 @@ impl<T: GCMethods + Copy> Drop for Heap<T> {
         unsafe {
             let ptr = self.ptr.get();
             T::post_barrier(ptr, *ptr, <T as GCMethods>::initial());
-            println!("Called drop for Heap<{:?}> ptr({:?})", std::any::type_name::<T>(), *(ptr as *mut *mut ()));
+            //println!("Called drop for Heap<{:?}> ptr({:?})", std::any::type_name::<T>(), *(ptr as *mut *mut ()));
         }
     }
 }
