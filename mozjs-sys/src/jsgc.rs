@@ -75,7 +75,7 @@ impl<T: Rootable> RootKind for T {
     const KIND: JS::RootKind = JS::RootKind::Traceable;
 
     fn pre_write_barrier(&self) {
-        println!("pre_write_barrier for RootKind<T>");
+        //println!("pre_write_barrier for RootKind<T>");
         T::pre_write_barrier(self)
     }
 }
