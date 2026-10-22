@@ -189,6 +189,10 @@ unsafe impl<T: Traceable> Traceable for RefCell<T> {
     unsafe fn trace(&self, trc: *mut JSTracer) {
         (*self).borrow().trace(trc);
     }
+
+    fn pre_write_barrier(&self) {
+        (*self).borrow().pre_write_barrier();
+    }
 }
 
 unsafe impl<T: Traceable> Traceable for Option<T> {
@@ -247,6 +251,12 @@ unsafe impl<T: Traceable> Traceable for Vec<T> {
             t.trace(trc);
         }
     }
+
+    fn pre_write_barrier(&self) {
+        for t in &*self {
+            t.pre_write_barrier();
+        }
+    }
 }
 
 unsafe impl<T: Traceable> Traceable for VecDeque<T> {
@@ -301,6 +311,7 @@ macro_rules! impl_traceable_tuple {
         unsafe impl Traceable for () {
             #[inline]
             unsafe fn trace(&self, _: *mut JSTracer) {}
+            fn pre_write_barrier(&self) {}
         }
     };
     ($($name:ident)+) => {
@@ -310,6 +321,11 @@ macro_rules! impl_traceable_tuple {
             unsafe fn trace(&self, trc: *mut JSTracer) {
                 let ($(ref $name,)+) = *self;
                 $($name.trace(trc);)+
+            }
+
+            fn pre_write_barrier(&self) {
+                let ($(ref $name,)+) = *self;
+                $($name.pre_write_barrier();)+
             }
         }
     };
