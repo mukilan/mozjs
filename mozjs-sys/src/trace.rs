@@ -78,7 +78,7 @@ unsafe impl Traceable for Heap<*mut JSObject> {
         if self.get().is_null() {
             return;
         }
-        println!("Invoking IncrementalPreWriteBarrier for *mut JSObject: {:?}", self.get());
+//        println!("Invoking IncrementalPreWriteBarrier for *mut JSObject: {:?}", self.get());
         unsafe { IncrementalPreWriteBarrier(self.get() ); }
     }
 }
