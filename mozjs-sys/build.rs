@@ -605,6 +605,7 @@ fn get_common_cc(build_dir: &Path, target: BuildTarget) -> cc::Build {
         builder.include(path);
     }
 
+
     builder.define("STATIC_JS_API", None);
     if env::var_os("CARGO_FEATURE_DEBUGMOZJS").is_some() {
         builder
