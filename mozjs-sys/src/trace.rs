@@ -6,7 +6,7 @@ use crate::glue::JS::IncrementalPreWriteBarrier;
 use crate::glue::{
     CallBigIntTracer, CallFunctionTracer, CallIdTracer, CallObjectTracer,
     CallPropertyDescriptorTracer, CallScriptTracer, CallStringTracer, CallSymbolTracer,
-    CallValueRootTracer, CallValueTracer,
+    CallValueRootTracer, CallValueTracer, IncrementalPreWriteBarrierForValue, IncrementalPreWriteBarrierForScript
 };
 use crate::jsapi::js::TraceValueArray;
 use crate::jsapi::JS::{PropertyDescriptor, Value};
@@ -107,7 +107,14 @@ unsafe impl Traceable for Heap<*mut JSScript> {
         if self.get().is_null() {
             return;
         }
-        CallScriptTracer(trc, self as *const _ as *mut Self, c"script".as_ptr());
+        let bt = format!("object: {:?}", CURRENT_TRACED.with_borrow(|t| t.join( "->")));
+        let cstr = CString::new(bt).unwrap();
+        CallScriptTracer(trc, self as *const _ as *mut Self, cstr.into_raw());
+    }
+
+    fn pre_write_barrier(&self) {
+        //println!("Invoking IncrementalPreWriteBarrier for Heap<*mut JSScript>: {:?}", self.get());
+        unsafe { IncrementalPreWriteBarrierForScript(self as *const _); }
     }
 }
 
@@ -124,10 +131,17 @@ unsafe impl Traceable for Heap<*mut JSString> {
 unsafe impl Traceable for Heap<Value> {
     #[inline]
     unsafe fn trace(&self, trc: *mut JSTracer) {
-        //let bt = std::backtrace::Backtrace::capture();
         let bt = format!("value: {:?}", CURRENT_TRACED.with_borrow(|t| t.join( "->")));
         let cstr = CString::new(bt).unwrap();
         CallValueTracer(trc, self as *const _ as *mut Self, cstr.into_raw());
+    }
+
+    fn pre_write_barrier(&self) {
+        if !self.get().is_gcthing() {
+            return;
+        }
+        //println!("Invoking IncrementalPreWriteBarrier for Heap<Value>: {:?}", self.get());
+        unsafe { IncrementalPreWriteBarrierForValue(self as *const _); }
     }
 }
 

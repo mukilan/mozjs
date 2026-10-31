@@ -1289,4 +1289,16 @@ bool ObjectIsTenured(JSObject* obj) {
   return JS::ObjectIsTenured(obj);
 }
 
+void IncrementalPreWriteBarrierForValue(const JS::Heap<JS::Value>* heap) {
+  const JS::Value& v = heap->unbarrieredGet();
+  if (v.isGCThing()) {
+    JS::IncrementalPreWriteBarrier(JS::GCCellPtr(v));
+  }
+}
+
+void IncrementalPreWriteBarrierForScript(const JS::Heap<JSScript*>* heap) {
+  auto v = heap->unbarrieredGet();
+  JS::IncrementalPreWriteBarrier(JS::GCCellPtr(v));
+}
+
 }  // extern "C"
