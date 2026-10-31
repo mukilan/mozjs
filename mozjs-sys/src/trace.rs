@@ -168,6 +168,10 @@ unsafe impl<T: Traceable + ?Sized> Traceable for Box<T> {
     unsafe fn trace(&self, trc: *mut JSTracer) {
         (**self).trace(trc);
     }
+
+    fn pre_write_barrier(&self) {
+        (**self).pre_write_barrier();
+    }
 }
 
 unsafe impl<T: Traceable + Copy> Traceable for Cell<T> {
@@ -212,6 +216,13 @@ unsafe impl<T: Traceable, E: Traceable> Traceable for Result<T, E> {
         match self {
             Ok(t) => t.trace(trc),
             Err(e) => e.trace(trc),
+        }
+    }
+
+    fn pre_write_barrier(&self) {
+        match self {
+            Ok(t) => t.pre_write_barrier(),
+            Err(e) => e.pre_write_barrier(),
         }
     }
 }
@@ -264,6 +275,12 @@ unsafe impl<T: Traceable> Traceable for VecDeque<T> {
     unsafe fn trace(&self, trc: *mut JSTracer) {
         for t in &*self {
             t.trace(trc);
+        }
+    }
+
+    fn pre_write_barrier(&self) {
+        for t in &*self {
+            t.pre_write_barrier();
         }
     }
 }

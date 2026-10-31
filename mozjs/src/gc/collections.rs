@@ -163,6 +163,11 @@ unsafe impl<T: Traceable + 'static> Traceable for RootedTraceableBox<T> {
     unsafe fn trace(&self, trc: *mut JSTracer) {
         (*self.ptr).trace(trc)
     }
+
+    fn pre_write_barrier(&self) {
+        // TODO: Check safety
+        unsafe { (*self.ptr).pre_write_barrier(); }
+    }
 }
 
 impl<T: Traceable> Deref for RootedTraceableBox<T> {
